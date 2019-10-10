@@ -50,15 +50,23 @@ namespace :scrape do
 
             # create hash with header
             names_stars_links = name_array.zip(star_array, link_array)
-            header = ["name", "star", "link","location"]
+            header = ["name", "star", "link"]
             hashed_names_stars_links = names_stars_links.map do |row|
                 restaurant_data = Hash[*header.zip(row).flatten]
-                restaurant_data.merge!({"location": arg.location})
-                Restaurant.create(restaurant_data)
+                
+                # create or update
+                restaurant = Restaurant.find_or_initialize_by(link: restaurant_data["link"])
+                restaurant.update_attributes(
+                    name: restaurant_data["name"],
+                    star: restaurant_data["star"],
+                    link: restaurant_data["link"],
+                    location: arg.location
+                )
             end
 
             sleep(0.8)
         end
+        puts Restaurant.all.size
     end
 
     desc 'create summary data'

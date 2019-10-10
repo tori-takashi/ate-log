@@ -52,9 +52,9 @@ namespace :scrape do
             names_stars_links = name_array.zip(star_array, link_array)
             header = ["name", "star", "link","location"]
             hashed_names_stars_links = names_stars_links.map do |row|
-                restaruant_data = Hash[*header.zip(row).flatten]
-                restaruant_data.merge!({"location": arg.location})
-                restaurant.create(restaruant_data)
+                restaurant_data = Hash[*header.zip(row).flatten]
+                restaurant_data.merge!({"location": arg.location})
+                Restaurant.create(restaurant_data)
             end
 
             sleep(0.8)

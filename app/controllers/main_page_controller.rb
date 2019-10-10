@@ -1,5 +1,5 @@
 class MainPageController < ApplicationController
     def index
-        @restaurants = restaurant.all
+        @restaurants = Restaurant.all
     end
 end

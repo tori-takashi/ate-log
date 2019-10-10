@@ -10,14 +10,14 @@ namespace :scrape do
             Rake::Task["scrape:scrape_stars"].invoke(location)
 
             puts "====================================================================="
-            puts "全体進捗: #{100*i/47}%完了"
+            puts "全体進捗: #{(100*i/47).floor(2)}%完了"
             puts "====================================================================="
             
             if is_first_loop
                 loop_one_time = Time.now - loop_start_time
                 total_estimated_time = 47*(loop_one_time)
                 puts "====================================================================="
-                puts "推定所要時間:#{total_estimated_time/60}分#{total_estimated_time%60}秒"
+                puts "推定所要時間:#{(total_estimated_time/60).floor(2)}分#{(total_estimated_time%60.floor)}秒"
                 puts "====================================================================="
             end
         end
@@ -97,18 +97,18 @@ namespace :scrape do
                 )
             end
             sleep(1.0)
-            puts "location:#{arg.location}の取得 #{100*page_count.to_f/pages.to_f}%完了..."
+            puts "location:#{arg.location}の取得 #{(100*page_count.to_f/pages.to_f).floor(2)}%完了..."
             if is_first_loop
                 loop_end_time = Time.now
                 loop_one_time = loop_end_time - loop_start_time
                 total_estimated_time = loop_one_time*pages
-                puts "location:#{arg.location}取得の推定所要時間：約#{(total_estimated_time/60).floor(1)}分#{(total_estimated_time%60).floor(1)}秒"
+                puts "location:#{arg.location}取得の推定所要時間：約#{(total_estimated_time/60).floor(2)}分#{(total_estimated_time%60).floor(2)}秒"
                 is_first_loop = false
             end
         end
         puts "summaryを作成中..."
-        Rake::Task[scrape:create_summary].invoke(arg.location)
-        puts "location:" + arg.location + "の取得を完了\n"
+        Rake::Task["scrape:create_summary"].invoke(arg.location)
+        puts "location:" + arg.location + "の取得とsummaryの作成を完了\n"
     end
 
     desc 'create summary data'

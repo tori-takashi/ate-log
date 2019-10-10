@@ -60,4 +60,8 @@ namespace :scrape do
             sleep(0.8)
         end
     end
+
+    desc 'create summary data'
+    task :create_summary,['location'] => :environment do |task, arg|
+    end
 end

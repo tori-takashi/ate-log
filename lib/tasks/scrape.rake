@@ -2,7 +2,7 @@ require 'open-uri'
 
 namespace :scrape do
     desc 'scraping tabelog stars data from tabelog.com'
-    task :scrape_stars, :environment do |task, location|
+    task :scrape_stars,['location'] => :environment do |task, arg|
 =begin
         location
             tokyo
@@ -14,8 +14,7 @@ namespace :scrape do
 =end
 
         base_url = "https://tabelog.com/"
-        location_url = base_url + location + "/rstLst/"
-        picked_data = []
+        location_url = base_url + arg.location + "/rstLst/"
         charset = nil
 
         # calculate fetching time
@@ -24,6 +23,8 @@ namespace :scrape do
             doc = Nokogiri::HTML.parse(data.read, nil, charset)
             doc.xpath("//span[@class='list-condition__count']/text()").text.to_i / 20 + 1
         end
+
+        pages = 10
 
         # loop and get name, star, link from tabelog
         pages.times do |page_count|
@@ -51,13 +52,11 @@ namespace :scrape do
             names_stars_links = name_array.zip(star_array, link_array)
             header = ["name", "star", "link"]
             hashed_names_stars_links = names_stars_links.map do |row|
-                Hash[*header.zip(row).flatten]
+                restaruant_data = Hash[*header.zip(row).flatten]
+                Restraunt.create(restaruant_data)
             end
 
-            #stack data
-            picked_data.append(hashed_names_stars_links)
             sleep(0.8)
         end
-        picked_data.flatten!
     end
 end

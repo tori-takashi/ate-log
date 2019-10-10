@@ -1,0 +1,2 @@
+class Restraunt < ApplicationRecord
+end

@@ -14,7 +14,7 @@ namespace :scrape do
                 
                 total_estimated_time = 47*(loop_one_time)
                 puts "====================================================================="
-                puts "推定所要時間:#{(total_estimated_time/60).floor(2)}分#{(total_estimated_time%60.floor)}秒"
+                puts "推定所要時間:#{(total_estimated_time/60).floor()}分#{(total_estimated_time%60).floor()}秒"
                 puts "====================================================================="
                 is_first_loop = false
             else
@@ -97,7 +97,7 @@ namespace :scrape do
                 loop_end_time = Time.now
                 loop_one_time = loop_end_time - loop_start_time
                 total_estimated_time = loop_one_time*pages
-                puts "location:#{arg.location}取得の推定所要時間：約#{(total_estimated_time/60).floor(2)}分#{(total_estimated_time%60).floor(2)}秒"
+                puts "location:#{arg.location}取得の推定所要時間：約#{(total_estimated_time/60).floor()}分#{(total_estimated_time%60).floor()}秒"
                 is_first_loop = false
             end
         end

@@ -1,5 +1,5 @@
 class MainPageController < ApplicationController
     def index
-        @restaurants = Restaurant.all
+        @restaurants = Restaurant.page(params[:page]).per(50)
     end
 end

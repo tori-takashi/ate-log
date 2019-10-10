@@ -1,3 +1,24 @@
 // Place all the styles related to the main_page controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.search-area {
+  font-size: 36px;
+}
+
+.search-button {
+  font-size: 48px;
+}
+
+td {
+  padding-top: 20px;
+  padding-bottom: 8px;
+  font-size: 24px;
+}
+
+.pagination {
+  font-size: 60px;
+  span {
+    margin-right: 24px;
+  }
+}

@@ -1,7 +1,15 @@
 <% @latest_data.each do |summary| %>
-    <% unless summary.nil? %>
-        <%= summary.location %>
-        <%= summary.created_at %>
-        <%= column_chart eval(summary.summary_data) %>
-    <% end %>
+    <div>
+        <% unless summary.nil? %>
+            <div>
+                場所：<%= summary.location %>
+            </div>
+            <div>
+                最終更新日時：<%= summary.created_at %>
+            </div>
+            <div>
+                <%= column_chart eval(summary.summary_data) %>
+            </div>
+        <% end %>
+    </div>
 <% end %>

@@ -1,0 +1,7 @@
+<% @latest_data.each do |summary| %>
+    <% unless summary.nil? %>
+        <%= summary.location %>
+        <%= summary.created_at %>
+        <%= column_chart eval(summary.summary_data) %>
+    <% end %>
+<% end %>

@@ -54,7 +54,7 @@ namespace :scrape do
             hashed_names_stars_links = names_stars_links.map do |row|
                 restaruant_data = Hash[*header.zip(row).flatten]
                 restaruant_data.merge!({"location": arg.location})
-                Restraunt.create(restaruant_data)
+                restaurant.create(restaruant_data)
             end
 
             sleep(0.8)
@@ -63,5 +63,8 @@ namespace :scrape do
 
     desc 'create summary data'
     task :create_summary,['location'] => :environment do |task, arg|
+        500.times do |i|
+            star  = i.to_f/100
+        end
     end
 end

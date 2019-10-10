@@ -5,12 +5,12 @@
             <th>レストラン</th>
             <th>星</th>
             <th>場所</th>
-        <% @restraunts.each do |restraunt| %>
+        <% @restaurants.each do |restaurant| %>
             </tr>
-                <td><%= restraunt.id %></td>
-                <td><%= link_to restraunt.name, restraunt.link %></td>
-                <td><%= restraunt.star %></td>
-                <td><%= restraunt.location %></td>
+                <td><%= restaurant.id %></td>
+                <td><%= link_to restaurant.name, restaurant.link %></td>
+                <td><%= restaurant.star %></td>
+                <td><%= restaurant.location %></td>
             <tr>
         <% end %>
     </table>

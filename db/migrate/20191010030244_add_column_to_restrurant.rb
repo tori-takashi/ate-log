@@ -1,5 +1,5 @@
-class AddColumnToRestrurant < ActiveRecord::Migration[5.2]
+class AddColumnToRestaurant < ActiveRecord::Migration[5.2]
     def change
-        add_column :restraunts, :location, :string
+        add_column :restaurants, :location, :string
     end
 end

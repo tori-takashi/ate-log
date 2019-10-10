@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema.define(version: 2019_10_10_030244) do
 
-  create_table "restraunts", force: :cascade do |t|
+  create_table "restaurants", force: :cascade do |t|
     t.string "name"
     t.float "star"
     t.text "link"

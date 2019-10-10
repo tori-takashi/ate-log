@@ -24,7 +24,7 @@ namespace :scrape do
             doc.xpath("//span[@class='list-condition__count']/text()").text.to_i / 20 + 1
         end
 
-        pages = 10
+        pages = 1
 
         # loop and get name, star, link from tabelog
         pages.times do |page_count|
@@ -50,9 +50,10 @@ namespace :scrape do
 
             # create hash with header
             names_stars_links = name_array.zip(star_array, link_array)
-            header = ["name", "star", "link"]
+            header = ["name", "star", "link","location"]
             hashed_names_stars_links = names_stars_links.map do |row|
                 restaruant_data = Hash[*header.zip(row).flatten]
+                restaruant_data.merge!({"location": arg.location})
                 Restraunt.create(restaruant_data)
             end
 

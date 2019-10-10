@@ -2,20 +2,38 @@
     <%= link_to "集計データ", summary_path %>
 </div>
 <div>
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>レストラン</th>
-            <th>星</th>
-            <th>場所</th>
-        <% @restaurants.each do |restaurant| %>
-            </tr>
-                <td><%= restaurant.id %></td>
-                <td><%= link_to restaurant.name, restaurant.link %></td>
-                <td><%= restaurant.star %></td>
-                <td><%= restaurant.location %></td>
-            <tr>
+    <div>
+        <%= search_form_for @q, url: main_page_index_path do |f| %>
+
+            <%= f.label "場所" %>
+            <%= f.search_field :location_cont %>
+            <%= f.label "レストラン名"%>
+            <%= f.search_field :name_cont %>
+
+            <%= f.label "星" %>
+            <%= f.search_field :star_gteq, value: 3.5  %>以上
+            <%= f.search_field :star_lteq, value: 3.79 %>以下
+            
+            <%= f.submit "検索" %>
+
         <% end %>
-    </table>
+    </div>
+    <div>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>レストラン</th>
+                <th>星</th>
+                <th>場所</th>
+            <% @restaurants.each do |restaurant| %>
+                </tr>
+                    <td><%= restaurant.id %></td>
+                    <td><%= link_to restaurant.name, restaurant.link %></td>
+                    <td><%= restaurant.star %></td>
+                    <td><%= restaurant.location %></td>
+                <tr>
+            <% end %>
+        </table>
+    </div>
     <%= paginate @restaurants %>
 </div>

@@ -1,5 +1,6 @@
 class MainPageController < ApplicationController
     def index
-        @restaurants = Restaurant.page(params[:page]).per(50)
+        @q = Restaurant.ransack(params[:q])
+        @restaurants = @q.result(distinct: true).page(params[:page]).per(50)
     end
 end

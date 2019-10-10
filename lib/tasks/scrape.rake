@@ -1,36 +1,69 @@
 require 'open-uri'
 
 namespace :scrape do
+    desc 'scrape for all locations'
+    task :scrape_all => :environment do
+        is_first_loop = true
+        location_array = Location.pluck(:location)
+        location_array.each_with_index do |location, i|
+            loop_start_time = Time.now if is_first_loop
+            Rake::Task["scrape:scrape_stars"].invoke(location)
+
+            puts "====================================================================="
+            puts "全体進捗: #{100*i/47}%完了"
+            puts "====================================================================="
+            
+            if is_first_loop
+                loop_one_time = Time.now - loop_start_time
+                total_estimated_time = 47*(loop_one_time)
+                puts "====================================================================="
+                puts "推定所要時間:#{total_estimated_time/60}分#{total_estimated_time%60}秒"
+                puts "====================================================================="
+            end
+        end
+    end
+
     desc 'scraping tabelog stars data from tabelog.com'
     task :scrape_stars,['location'] => :environment do |task, arg|
-=begin
-        location
-            tokyo
-            kanagawa
-            aichi
-            osaka
-            kyoto
-            fukuoka
-=end
 
+        start_time = Time.now
         base_url = "https://tabelog.com/"
         location_url = base_url + arg.location + "/rstLst/"
         charset = nil
+        error_interval = 0
+        is_first_loop = true
 
-        # calculate fetching time
+        fetch_start_time = Time.now
+        # calculate the number of times to fetch all restaurant
+        puts "location:" + arg.location + "を取得します"
+        # limited to 59 pages
+
+=begin
         pages = open(location_url) do |data|
             charset = data.charset
             doc = Nokogiri::HTML.parse(data.read, nil, charset)
             doc.xpath("//span[@class='list-condition__count']/text()").text.to_i / 20 + 1
         end
+=end
+        pages = 59
 
-        pages = 1
+        fetch_end_time = Time.now
+        get_1_page_time = fetch_end_time - fetch_start_time
 
         # loop and get name, star, link from tabelog
         pages.times do |page_count|
-            url = location_url + "#{page_count+1}/"
-            fetched = open(url) do |data|
-                data.read
+            loop_start_time = Time.now if is_first_loop
+            begin 
+                url = location_url + "#{page_count+1}/"
+                fetched = open(url) do |data|
+                    data.read
+                end
+            rescue => e
+                puts e
+                error_interval += 30
+                puts "#{error_interval}秒経ってからリトライします..."
+                sleep(error_interval)
+                retry
             end
 
             doc = Nokogiri::HTML.parse(fetched, nil, charset)
@@ -63,27 +96,36 @@ namespace :scrape do
                     location: arg.location
                 )
             end
-
-            sleep(0.8)
+            sleep(1.0)
+            puts "location:#{arg.location}の取得 #{100*page_count.to_f/pages.to_f}%完了..."
+            if is_first_loop
+                loop_end_time = Time.now
+                loop_one_time = loop_end_time - loop_start_time
+                total_estimated_time = loop_one_time*pages
+                puts "location:#{arg.location}取得の推定所要時間：約#{(total_estimated_time/60).floor(1)}分#{(total_estimated_time%60).floor(1)}秒"
+                is_first_loop = false
+            end
         end
-        puts Restaurant.all.size
+        puts "summaryを作成中..."
+        Rake::Task[scrape:create_summary].invoke(arg.location)
+        puts "location:" + arg.location + "の取得を完了\n"
     end
 
     desc 'create summary data'
     task :create_summary,['location'] => :environment do |task, arg|
-        detailed_summary_data = []
-        summary_data = []
+        detailed_summary_data = {}
+        summary_data = {}
         count_summary = 0
 
         500.times do |i|
             star  = i.to_f/100
             count = Restaurant.where(star: star, location: arg.location).count
             count_summary = count_summary + count
-            detailed_summary_data.append({star => count})
+            detailed_summary_data.merge!({star => count})
             if i%10 == 9
                 # e.g if star = 2.89, the data contains from 2.80~2.89 
                 # the data contains 0.00 ~ 4.99
-                summary_data.append({"#{star}~#{(star-0.09).floor(2)}" => count_summary})
+                summary_data.merge!({"#{star}~#{(star-0.09).floor(2)}" => count_summary})
                 count_summary = 0
             end
         end

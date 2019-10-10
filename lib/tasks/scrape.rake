@@ -83,7 +83,7 @@ namespace :scrape do
             if i%10 == 9
                 # e.g if star = 2.89, the data contains from 2.80~2.89 
                 # the data contains 0.00 ~ 4.99
-                summary_data.append({"#{star}~#{(star-0.09).floor(2)}" => count})
+                summary_data.append({"#{star}~#{(star-0.09).floor(2)}" => count_summary})
                 count_summary = 0
             end
         end

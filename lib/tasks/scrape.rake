@@ -6,18 +6,22 @@ namespace :scrape do
         is_first_loop = true
         location_array = Location.pluck(:location)
         location_array.each_with_index do |location, i|
-            loop_start_time = Time.now if is_first_loop
-            Rake::Task["scrape:scrape_stars"].invoke(location)
-
-            puts "====================================================================="
-            puts "全体進捗: #{(100*i/47).floor(2)}%完了"
-            puts "====================================================================="
-            
             if is_first_loop
+
+                loop_start_time = Time.now
+                Rake::Task["scrape:scrape_stars"].invoke(location)
                 loop_one_time = Time.now - loop_start_time
+                
                 total_estimated_time = 47*(loop_one_time)
                 puts "====================================================================="
                 puts "推定所要時間:#{(total_estimated_time/60).floor(2)}分#{(total_estimated_time%60.floor)}秒"
+                puts "====================================================================="
+                is_first_loop = false
+            else
+                Rake::Task["scrape:scrape_stars"].reenable
+                Rake::Task["scrape:scrape_stars"].invoke(location)
+                puts "====================================================================="
+                puts "全体進捗: #{(100*i/47).floor(2)}%完了"
                 puts "====================================================================="
             end
         end
@@ -33,22 +37,11 @@ namespace :scrape do
         error_interval = 0
         is_first_loop = true
 
-        fetch_start_time = Time.now
         # calculate the number of times to fetch all restaurant
         puts "location:" + arg.location + "を取得します"
+
         # limited to 59 pages
-
-=begin
-        pages = open(location_url) do |data|
-            charset = data.charset
-            doc = Nokogiri::HTML.parse(data.read, nil, charset)
-            doc.xpath("//span[@class='list-condition__count']/text()").text.to_i / 20 + 1
-        end
-=end
         pages = 59
-
-        fetch_end_time = Time.now
-        get_1_page_time = fetch_end_time - fetch_start_time
 
         # loop and get name, star, link from tabelog
         pages.times do |page_count|
@@ -98,6 +91,8 @@ namespace :scrape do
             end
             sleep(1.0)
             puts "location:#{arg.location}の取得 #{(100*page_count.to_f/pages.to_f).floor(2)}%完了..."
+
+            # calc estimated time at first loop
             if is_first_loop
                 loop_end_time = Time.now
                 loop_one_time = loop_end_time - loop_start_time
@@ -106,7 +101,9 @@ namespace :scrape do
                 is_first_loop = false
             end
         end
+
         puts "summaryを作成中..."
+        Rake::Task["scrape:create_summary"].reenable
         Rake::Task["scrape:create_summary"].invoke(arg.location)
         puts "location:" + arg.location + "の取得とsummaryの作成を完了\n"
     end

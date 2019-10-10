@@ -1,0 +1,17 @@
+<div>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>レストラン</th>
+            <th>星</th>
+            <th>場所</th>
+        <% @restraunts.each do |restraunt| %>
+            </tr>
+                <td><%= restraunt.id %></td>
+                <td><%= link_to restraunt.name, restraunt.link %></td>
+                <td><%= restraunt.star %></td>
+                <td><%= restraunt.location %></td>
+            <tr>
+        <% end %>
+    </table>
+</div>

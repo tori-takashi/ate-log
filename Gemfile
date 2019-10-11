@@ -65,3 +65,7 @@ gem 'chartkick'
 gem 'kaminari'
 gem 'ransack'
 gem 'line-bot-api'
+
+group :production, :staging do
+  gem 'unicorn'
+end

@@ -66,6 +66,7 @@ gem 'kaminari'
 gem 'ransack'
 gem 'dotenv-rails'
 gem 'line-bot-api'
+gem 'whenever'
 
 group :production, :staging do
   gem 'unicorn'

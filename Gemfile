@@ -71,4 +71,5 @@ gem 'whenever'
 group :production, :staging do
   gem 'unicorn'
   gem 'mysql2', '>=0.5.2'
+  gem 'google-analytics-rails', '1.1.1'
 end

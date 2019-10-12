@@ -2,7 +2,7 @@
     <div>
         <%= search_form_for @q, url: main_page_index_path, class: "search-area" do |f| %>
             <div>
-                <%= f.label "場所" %>
+                <%= f.label "都道府県(location)" %>
                 <%= f.search_field :location_cont, class: "search-area" %>
             </div>
             <div>

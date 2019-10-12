@@ -19,6 +19,21 @@
                 <%= f.search_field :reviews_gteq, value: 30  , class: "search-area" %>以上
                 <%= f.search_field :reviews_lteq, class: "search-area" %>以下
             </div>
+            <div class="search-checkboxes">
+                <%= f.label "レストランのユーザー種別"%>
+                <div>
+                    <%= f.label "非会員" %>
+                    <%= f.check_box :restaurant_user_type_eq_any, {multiple: true}, 'not_user', '' %>
+                </div>
+                <div>
+                    <%= f.label "非課金" %>
+                    <%= f.check_box :restaurant_user_type_eq_any, {multiple: true}, 'normal_user', '' %>
+                </div>
+                <div>
+                    <%= f.label "課金" %>
+                    <%= f.check_box :restaurant_user_type_eq_any, {multiple: true}, 'premium_user', '' %>
+                </div>
+            </div>
             <div>
                 <%= f.submit "検索", class: "search-button" %>
             </div>
@@ -32,6 +47,7 @@
                 <th><%= sort_link(@q, :star, "星") %></th>
                 <th><%= sort_link(@q, :location, "都道府県(location)")%></th>
                 <th><%= sort_link(@q, :reviews, "レビュー数") %></th>
+                <th><%= sort_link(@q, :restaurant_user_type, "レストランのユーザー種別") %></th>
             <% @restaurants.each do |restaurant| %>
                 </tr class="row">
                     <td><%= restaurant.id %></td>
@@ -39,6 +55,7 @@
                     <td><%= restaurant.star %></td>
                     <td><%= restaurant.location %></td>
                     <td><%= restaurant.reviews %></td>
+                    <td><%= restaurant.restaurant_user_type %></td>
                 <tr>
             <% end %>
         </table>

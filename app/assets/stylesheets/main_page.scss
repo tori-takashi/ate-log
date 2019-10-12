@@ -6,6 +6,13 @@
   font-size: 36px;
 }
 
+.search-checkboxes {
+  input {
+    position: relative;
+    transform: scale(2.5);
+  }
+}
+
 .search-button {
   font-size: 48px;
 }

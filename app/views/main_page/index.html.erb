@@ -15,6 +15,11 @@
                 <%= f.search_field :star_lteq, value: 3.79 , class: "search-area" %>以下
             </div>
             <div>
+                <%= f.label "レビュー数" %>
+                <%= f.search_field :reviews_gteq, value: 30  , class: "search-area" %>以上
+                <%= f.search_field :reviews_lteq, class: "search-area" %>以下
+            </div>
+            <div>
                 <%= f.submit "検索", class: "search-button" %>
             </div>
         <% end %>
@@ -26,12 +31,14 @@
                 <th><%= sort_link(@q, :name, "レストラン") %></th>
                 <th><%= sort_link(@q, :star, "星") %></th>
                 <th><%= sort_link(@q, :location, "都道府県(location)")%></th>
+                <th><%= sort_link(@q, :reviews, "レビュー数") %></th>
             <% @restaurants.each do |restaurant| %>
                 </tr class="row">
                     <td><%= restaurant.id %></td>
                     <td><%= link_to restaurant.name, restaurant.link %></td>
                     <td><%= restaurant.star %></td>
                     <td><%= restaurant.location %></td>
+                    <td><%= restaurant.reviews %></td>
                 <tr>
             <% end %>
         </table>

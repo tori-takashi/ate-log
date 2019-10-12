@@ -32,6 +32,8 @@ notes
 notes:custom
 restart
 routes
+scrape:create_all_prefectures_summary
+scrape:create_all_summary
 scrape:create_summary[location]
 scrape:scrape_all
 scrape:scrape_stars[location]

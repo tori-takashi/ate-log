@@ -1,0 +1,67 @@
+<div class="header">
+    <div class="header-item">
+        <%= link_to "47都道府県" , summary_with_threshold_path(threshold: "47prefectures"), class: "header-text" %>
+    </div>
+    <div class="header-item">
+        <%= link_to "条件なし" , summary_with_threshold_path(threshold: 0), class: "header-text" %>
+    </div>
+    <div class="header-item">
+        <%= link_to "review30件以上" , summary_with_threshold_path(threshold: 30), class: "header-text" %>
+    </div>
+    <div class="header-item">
+        <%= link_to "review50件以上" , summary_with_threshold_path(threshold: 50), class: "header-text" %>
+    </div>
+</div>
+
+<div>
+    <%= @title %>
+</div>
+
+<% if params[:threshold] == "47prefectures" %>
+
+    <div>
+        条件なし
+    </div>
+    <div>
+        最終更新日時：<%= @summary_0.created_at %>
+    </div>
+    <div>
+        <%= column_chart eval(@summary_0.summary_data) %>
+    </div>
+
+    <div>
+        レビュー30件以上
+    </div>
+    <div>
+        最終更新日時：<%= @summary_30.created_at %>
+    </div>
+    <div>
+        <%= column_chart eval(@summary_30.summary_data) %>
+    </div>
+
+    <div>
+        レビュー50件以上
+    </div>
+    <div>
+        最終更新日時：<%= @summary_50.created_at %>
+    </div>
+    <div>
+        <%= column_chart eval(@summary_50.summary_data) %>
+    </div>
+<% else %>
+    <% @latest_data.each do |summary| %>
+        <div>
+            <% unless summary.nil? %>
+                <div>
+                    場所：<%= summary.location %>
+                </div>
+                <div>
+                    最終更新日時：<%= summary.created_at %>
+                </div>
+                <div>
+                    <%= column_chart eval(summary.summary_data) %>
+                </div>
+            <% end %>
+        </div>
+    <% end %>
+<% end %>

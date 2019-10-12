@@ -33,7 +33,7 @@
               <%= link_to "8log.info", root_path, class: "header-text" %>
           </div>
           <div class="header-item-center">
-              <%= link_to "食べログ評価の最新の分布", summary_path, class: "header-text" %>
+              <%= link_to "食べログ評価の最新の分布", summary_with_threshold_path(threshold: 0), class: "header-text" %>
           </div>
           <div class="header-item">
               <%= link_to "製作者について", "https://toritakashi.com", class: "header-text" %>

@@ -4,8 +4,7 @@ namespace :scrape do
     desc 'scrape for all locations'
     task :scrape_all => :environment do
         is_first_loop = true
-        location_array = Location.pluck(:location)
-        location_array.each_with_index do |location, i|
+        locations.each_with_index do |location, i|
             if is_first_loop
 
                 loop_start_time = Time.now
@@ -24,6 +23,7 @@ namespace :scrape do
                 puts "全体進捗: #{(100*i/47).floor(2)}%完了"
                 puts "====================================================================="
             end
+            Rake::Task["scrape:create_all_prefectures_summary"].invoke()
         end
     end
 
@@ -60,9 +60,10 @@ namespace :scrape do
             end
 
             doc = Nokogiri::HTML.parse(fetched, nil, charset)
-            names = doc.xpath("//a[@class='list-rst__rst-name-target cpy-rst-name']/text()")
-            stars = doc.xpath("//span[@class='c-rating__val c-rating__val--strong list-rst__rating-val']/text()")
-            links = doc.xpath("//a[@class='list-rst__rst-name-target cpy-rst-name']/@href")
+            names   = doc.xpath("//a[@class='list-rst__rst-name-target cpy-rst-name']/text()")
+            stars   = doc.xpath("//span[@class='c-rating__val c-rating__val--strong list-rst__rating-val']/text()")
+            links   = doc.xpath("//a[@class='list-rst__rst-name-target cpy-rst-name']/@href")
+            reviews = doc.xpath("//em[@class='list-rst__rvw-count-num cpy-review-count']")
             
             name_array = names.map do |name|
                 name.text
@@ -73,11 +74,14 @@ namespace :scrape do
             link_array = links.map do |link|
                 link.text
             end
+            reviews_array = reviews.map do |review|
+                review.text.to_i
+            end
 
             # create hash with header
-            names_stars_links = name_array.zip(star_array, link_array)
-            header = ["name", "star", "link"]
-            hashed_names_stars_links = names_stars_links.map do |row|
+            restaurant_record = name_array.zip(star_array, link_array, reviews_array)
+            header = ["name", "star", "link", "review"]
+            restaurant_record.map do |row|
                 restaurant_data = Hash[*header.zip(row).flatten]
                 
                 # create or update
@@ -86,6 +90,7 @@ namespace :scrape do
                     name: restaurant_data["name"],
                     star: restaurant_data["star"],
                     link: restaurant_data["link"],
+                    reviews: restaurant_data["review"],
                     location: arg.location
                 )
             end
@@ -114,28 +119,34 @@ namespace :scrape do
         summary_data = {}
         count_summary = 0
 
-        500.times do |i|
-            star  = i.to_f/100
-            count = Restaurant.where("star LIKE #{star}", location: arg.location).count
-            count_summary = count_summary + count
-            detailed_summary_data.merge!({star => count})
-            if i%10 == 9
-                # e.g if star = 2.89, the data contains from 2.80~2.89 
-                # the data contains 0.00 ~ 4.99
-                summary_data.merge!({"#{star}~#{(star-0.09).floor(2)}" => count_summary})
-                count_summary = 0
+        reviews_threshold = [0,30,50]
+        reviews_threshold.each do |threshold|
+            500.times do |i|
+                star  = i.to_f/100
+                count = Restaurant.where("star LIKE #{star}")
+                                  .where(location: arg.location)
+                                  .where("reviews >= #{threshold}").count
+                count_summary = count_summary + count
+                detailed_summary_data.merge!({star => count})
+                if i%10 == 9
+                    # e.g if star = 2.89, the data contains from 2.80~2.89 
+                    # the data contains 0.00 ~ 4.99
+                    summary_data.merge!({"#{star}~#{(star-0.09).floor(2)}" => count_summary})
+                    count_summary = 0
+                end
             end
+            Summary.create(summary_data: detailed_summary_data.to_s, summary_type: "detailed", location: arg.location,\
+                data_description: "more than or equal to #{threshold}")
+            Summary.create(summary_data: summary_data.to_s, summary_type: "aggregated", location: arg.location,\
+                data_description: "more than or equal to #{threshold}")
         end
 
-        Summary.create(summary_data: detailed_summary_data.to_s, summary_type: "detailed", location: arg.location)
-        Summary.create(summary_data: summary_data.to_s, summary_type: "aggregated", location: arg.location)
 
     end
 
     desc 'create all summary'
     task :create_all_summary => :environment do
-        location_array = Location.pluck(:location)
-        location_array.each_with_index do |location, i|
+        locations.each_with_index do |location, i|
             puts 'location:' + location + 'のサマリーを作成中'
             Rake::Task["scrape:create_summary"].reenable
             Rake::Task["scrape:create_summary"].invoke(location)
@@ -143,4 +154,26 @@ namespace :scrape do
 
     end
 
+    desc 'create all prefectures summary'
+    task :create_all_prefectures_summary => :environment do
+        reviews_threshold.each do |threshold|
+            accumlated_summary_data = {}
+            #locations.each do |location|
+            ["hokkaido", "tokyo"].each do |location|
+                summary_data = eval(Summary.where(location: location, summary_type: "detailed",\
+                data_description: "more than or equal to #{threshold}").last.summary_data)
+                accumlated_summary_data.merge!(summary_data){|k, v1, v2| v1 + v2}
+            end
+            Summary.create(summary_data: accumlated_summary_data.to_s, summary_type: "47prefectures_detailed",\
+                data_description: "more than or equal to #{threshold}")
+        end
+    end
+
+    def reviews_threshold
+        threshold = [0,30,50]
+    end
+
+    def locations
+        Location.all.pluck(:location)
+    end
 end

@@ -23,8 +23,8 @@ namespace :scrape do
                 puts "全体進捗: #{(100*i/47).floor(2)}%完了"
                 puts "====================================================================="
             end
-            Rake::Task["scrape:create_all_prefectures_summary"].invoke()
         end
+        Rake::Task["scrape:create_all_prefectures_summary"].invoke()
     end
 
     desc 'scraping tabelog stars data from tabelog.com'

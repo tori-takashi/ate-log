@@ -116,7 +116,7 @@ namespace :scrape do
 
         500.times do |i|
             star  = i.to_f/100
-            count = Restaurant.where(star: star, location: arg.location).count
+            count = Restaurant.where("star LIKE #{star}", location: arg.location).count
             count_summary = count_summary + count
             detailed_summary_data.merge!({star => count})
             if i%10 == 9
@@ -129,6 +129,17 @@ namespace :scrape do
 
         Summary.create(summary_data: detailed_summary_data.to_s, summary_type: "detailed", location: arg.location)
         Summary.create(summary_data: summary_data.to_s, summary_type: "aggregated", location: arg.location)
+
+    end
+
+    desc 'create all summary'
+    task :create_all_summary => :environment do
+        location_array = Location.pluck(:location)
+        location_array.each_with_index do |location, i|
+            puts 'location:' + location + 'のサマリーを作成中'
+            Rake::Task["scrape:create_summary"].reenable
+            Rake::Task["scrape:create_summary"].invoke(location)
+        end
 
     end
 

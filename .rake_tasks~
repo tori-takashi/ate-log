@@ -33,7 +33,7 @@ notes:custom
 restart
 routes
 scrape:create_summary[location]
-scrape:scrape_all[environment]
+scrape:scrape_all
 scrape:scrape_stars[location]
 secret
 stats

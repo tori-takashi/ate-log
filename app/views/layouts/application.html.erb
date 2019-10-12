@@ -8,10 +8,15 @@
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag "https://www.gstatic.com/charts/loader.js" %>
-    <%= analytics_init if GoogleAnalytics.valid_tracker? %>
+    <%= analytics_init if Rails.env.production? %>
     <script type="text/javascript" language="javascript">
         var vc_pid = "886083277";
     </script><script type="text/javascript" src="//aml.valuecommerce.com/vcdal.js" async></script>
+    <%= favicon_link_tag('favicon.ico') %>
+    <%= favicon_link_tag('8log_icon.png',
+                     {:rel => 'apple-touch-icon',
+                      :sizes => '180x180',
+                      :type => 'image/png'}) %>
   </head>
 
   <body>

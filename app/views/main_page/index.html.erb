@@ -11,12 +11,12 @@
             </div>
             <div>
                 <%= f.label "星" %>
-                <%= f.search_field :star_gteq, value: 3.5  , class: "search-area" %>以上
-                <%= f.search_field :star_lteq, value: 3.79 , class: "search-area" %>以下
+                <%= f.search_field :star_gteq, class: "search-area" %>以上
+                <%= f.search_field :star_lteq, class: "search-area" %>以下
             </div>
             <div>
-                <%= f.label "レビュー数" %>
-                <%= f.search_field :reviews_gteq, value: 30  , class: "search-area" %>以上
+                <%= f.label "口コミ数" %>
+                <%= f.search_field :reviews_gteq, class: "search-area" %>以上
                 <%= f.search_field :reviews_lteq, class: "search-area" %>以下
             </div>
             <div class="search-checkboxes">
@@ -46,7 +46,7 @@
                 <th><%= sort_link(@q, :name, "レストラン") %></th>
                 <th><%= sort_link(@q, :star, "星") %></th>
                 <th><%= sort_link(@q, :location, "都道府県(location)")%></th>
-                <th><%= sort_link(@q, :reviews, "レビュー数") %></th>
+                <th><%= sort_link(@q, :reviews, "口コミ数") %></th>
                 <th><%= sort_link(@q, :restaurant_user_type, "レストランのユーザー種別") %></th>
             <% @restaurants.each do |restaurant| %>
                 </tr class="row">
@@ -68,11 +68,23 @@
         <%= link_to "連絡はTwitterのDMより", "https://twitter.com/tori_toutosh1" %>
     </div>
     <div>
-        参考
-        <%= link_to "「食べログ」に関する一部報道について", "https://prtimes.jp/main/html/rd/p/000000713.000001455.html" %>
-        <%= link_to "データ解析を駆使して食べログ3.8問題が証明できなかった話", "https://konkon3249.hatenablog.com/entry/2019/10/10/020458" %>
-        <%= link_to "https://twitter.com/nardtree/status/1182529429488074752", "https://twitter.com/nardtree/status/1182529429488074752" %>
-        <%= link_to "食べログ3.8問題を検証", "https://clean-copy-of-onenote.hatenablog.com/entry/tabelog38_problem" %>
-        <%= link_to "https://twitter.com/samepacola/status/1181498293143998464", "https://twitter.com/samepacola/status/1181498293143998464" %>
+        <div>
+            参考
+        </div>
+        <div>
+            <%= link_to "「食べログ」に関する一部報道について", "https://prtimes.jp/main/html/rd/p/000000713.000001455.html" %>
+        </div>
+        <div>
+           <%= link_to "データ解析を駆使して食べログ3.8問題が証明できなかった話", "https://konkon3249.hatenablog.com/entry/2019/10/10/020458" %>
+        </div>
+        <div>
+           <%= link_to "https://twitter.com/nardtree/status/1182529429488074752", "https://twitter.com/nardtree/status/1182529429488074752" %>
+        </div>
+        <div>
+           <%= link_to "食べログ3.8問題を検証", "https://clean-copy-of-onenote.hatenablog.com/entry/tabelog38_problem" %>
+        </div>
+        <div>
+           <%= link_to "https://twitter.com/samepacola/status/1181498293143998464", "https://twitter.com/samepacola/status/1181498293143998464" %>
+        </div>
     </div>
 </div>

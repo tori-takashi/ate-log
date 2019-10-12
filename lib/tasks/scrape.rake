@@ -46,24 +46,14 @@ namespace :scrape do
         # loop and get name, star, link from tabelog
         pages.times do |page_count|
             loop_start_time = Time.now if is_first_loop
-            begin 
-                url = location_url + "#{page_count+1}/"
-                fetched = open(url) do |data|
-                    data.read
-                end
-            rescue => e
-                puts e
-                error_interval += 30
-                puts "#{error_interval}秒経ってからリトライします..."
-                sleep(error_interval)
-                retry
-            end
+            url = location_url + "#{page_count+1}/"
+            fetched = download_data(url)
 
-            doc = Nokogiri::HTML.parse(fetched, nil, charset)
-            names   = doc.xpath("//a[@class='list-rst__rst-name-target cpy-rst-name']/text()")
-            stars   = doc.xpath("//span[@class='c-rating__val c-rating__val--strong list-rst__rating-val']/text()")
-            links   = doc.xpath("//a[@class='list-rst__rst-name-target cpy-rst-name']/@href")
-            reviews = doc.xpath("//em[@class='list-rst__rvw-count-num cpy-review-count']")
+            search_result = Nokogiri::HTML.parse(fetched, nil, charset)
+            names   = search_result.xpath("//a[@class='list-rst__rst-name-target cpy-rst-name']/text()")
+            stars   = search_result.xpath("//span[@class='c-rating__val c-rating__val--strong list-rst__rating-val']/text()")
+            links   = search_result.xpath("//a[@class='list-rst__rst-name-target cpy-rst-name']/@href")
+            reviews = search_result.xpath("//em[@class='list-rst__rvw-count-num cpy-review-count']")
             
             name_array = names.map do |name|
                 name.text
@@ -113,6 +103,36 @@ namespace :scrape do
         puts "location:" + arg.location + "の取得とsummaryの作成を完了\n"
     end
 
+    desc 'set not_user, normal_user, premium_user'
+    task :update_restaurant_user_type, ['location'] => :environment do |task, arg|
+        is_first_loop = true
+        location = arg.location
+        all_restaurant_in_location = Restaurant.where(location: location)
+        link_array = all_restaurant_in_location.pluck(:link)
+        count = all_restaurant_in_location.count
+
+        link_array.each do | link |
+            start_time = Time.now if is_first_loop
+
+            restaurant_page = download_data(link)
+            restaurant_page_data = Nokogiri::HTML.parse(restaurant_page) 
+            restaurant_user_type = identify_not_normal_premium(restaurant_page_data)
+            Restaurant.find_by(link: link).update(restaurant_user_type: restaurant_user_type)
+            sleep(0.5)
+
+            puts "推定所要時間:#{((Time.now - start_time)*count/60).floor(1)}分#{((Time.now - start_time)*count%60).floor(1)}秒" if is_first_loop
+            is_first_loop = false
+        end
+    end
+
+    desc 'detect usertype for all restaurants'
+    task :update_all_restaurant_user_type => :environment do
+        locations.each do |location|
+            Rake::Task["scrape:update_restaurant_user_type"].reenable
+            Rake::Task["scrape:update_restaurant_user_type"].invoke(location)
+        end
+    end
+
     desc 'create summary data'
     task :create_summary,['location'] => :environment do |task, arg|
         detailed_summary_data = {}
@@ -146,7 +166,7 @@ namespace :scrape do
 
     desc 'create all summary'
     task :create_all_summary => :environment do
-        locations.each_with_index do |location, i|
+        locations.each do | location |
             puts 'location:' + location + 'のサマリーを作成中'
             Rake::Task["scrape:create_summary"].reenable
             Rake::Task["scrape:create_summary"].invoke(location)
@@ -174,5 +194,32 @@ namespace :scrape do
 
     def locations
         Location.all.pluck(:location)
+    end
+
+    def download_data(url)
+        begin 
+            fetched = open(url) do |data|
+                data.read
+            end
+        rescue => e
+            puts e
+            error_interval += 30
+            puts "#{error_interval}秒経ってからリトライします..."
+            sleep(error_interval)
+            retry
+        end
+        fetched
+    end
+
+    def identify_not_normal_premium(restaurant_page_data)
+        restaurant_user_type = ""
+        has_official_badge = !restaurant_page_data.xpath("//p[@class='owner-badge__icon']").empty?
+        if has_official_badge
+            is_premium = !restaurant_page_data.xpath("//h3[@class='pr-comment-title js-pr-title']").empty?
+            is_premium ? restaurant_user_type = "premium_user" : restaurant_user_type = "normal_user"
+        else
+            restaurant_user_type = "not_user"
+        end
+        restaurant_user_type
     end
 end

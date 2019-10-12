@@ -25,7 +25,7 @@
                 <th><%= sort_link(@q, :id, "ID") %></th>
                 <th><%= sort_link(@q, :name, "レストラン") %></th>
                 <th><%= sort_link(@q, :star, "星") %></th>
-                <th><%= sort_link(@q, :location, "場所")%></th>
+                <th><%= sort_link(@q, :location, "都道府県(location)")%></th>
             <% @restaurants.each do |restaurant| %>
                 </tr class="row">
                     <td><%= restaurant.id %></td>

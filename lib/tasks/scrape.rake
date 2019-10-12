@@ -158,8 +158,7 @@ namespace :scrape do
     task :create_all_prefectures_summary => :environment do
         reviews_threshold.each do |threshold|
             accumlated_summary_data = {}
-            #locations.each do |location|
-            ["hokkaido", "tokyo"].each do |location|
+            locations.each do |location|
                 summary_data = eval(Summary.where(location: location, summary_type: "detailed",\
                 data_description: "more than or equal to #{threshold}").last.summary_data)
                 accumlated_summary_data.merge!(summary_data){|k, v1, v2| v1 + v2}
